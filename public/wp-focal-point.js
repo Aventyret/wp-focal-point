@@ -7,9 +7,11 @@
     document.getElementById('fpt_Modal').remove();
   }
 
+  let imageId = null;
   function maybeOpenModal(e) {
-    const imageId = e.target.getAttribute('data-wp-focal-point');
-    if (imageId) {
+    // const maybeImageId = e.target.getAttribute('data-wp-focal-point');
+    if (e.target.getAttribute('data-wp-focal-point')) {
+      imageId = e.target.getAttribute('data-wp-focal-point');
       const image = wp.media.attachment(imageId);
       if (!image) {
         return;
@@ -26,7 +28,7 @@
       // image
       modalHtml += '<figure class="wp-focal-point-image"><div class="pos-wrapper"><p class="pos">X: <span class="posX">50</span>%</p><p class="pos">Y: <span class="posY">50</span>%</p>';
       modalHtml += '</div><div class="fpt_cursor"></div><img src="' + image.attributes.url + '" /></figure>';
-      modalHtml += '<button class="button">Save</button>';
+      modalHtml += '<button class="button save-focal-point">Save</button>';
       modalHtml+= '</div>'; // modalColLeft
 
       // examples
@@ -48,11 +50,13 @@
       document.body.insertAdjacentHTML('beforeend', modalHtml);
       // document.body.appendChild(modalHtml);
       document.querySelector('.fpt_ModalClose').addEventListener('click', closeModal);
-      document.querySelector('.wp-focal-point-image').addEventListener('click', function(e) {
-        setFocalPoint(e);
-      });
+      document.querySelector('.wp-focal-point-image').addEventListener('click', setFocalPoint);
+      document.querySelector('.save-focal-point').addEventListener('click', saveFocalPoint);
     }
   }
+
+  let posX = 0.5;
+  let posY = 0.5;
 
   function setFocalPoint (e) {
     const imageEl = document.querySelector('.wp-focal-point-image');
@@ -61,18 +65,48 @@
     const cursor = document.querySelector('.fpt_cursor');
     const previewEls = document.querySelectorAll('.fpt-preview img');
     let rect = imageEl.getBoundingClientRect();
-    let posX;
-    let posY;
+    // let posX;
+    // let posY;
 
-    posX = Math.round(((e.pageX - rect.left) / imageWidth) * 100);
-    posY = Math.round(((e.pageY - rect.top) / imageHeight) * 100);
+    posX = (e.pageX - rect.left) / imageWidth;
+    posY = (e.pageY - rect.top) / imageHeight;
 
-    document.querySelector('.posX').innerHTML = posX;
-    document.querySelector('.posY').innerHTML = posY;
-    cursor.style.top = posY + '%';
-    cursor.style.left = posX + '%';
+    const posXPercentage = Math.round(posX * 100);
+    const posYPercentage = Math.round(posY * 100);
 
-    previewEls.forEach(el => el.style.objectPosition = `${posX}% ${posY}%`);
+    document.querySelector('.posX').innerHTML = posXPercentage;
+    document.querySelector('.posY').innerHTML = posYPercentage;
+    cursor.style.top = posYPercentage + '%';
+    cursor.style.left = posXPercentage + '%';
+
+    previewEls.forEach(el => el.style.objectPosition = `${posXPercentage}% ${posYPercentage}%`);
+  }
+
+  function saveFocalPoint(e) {
+    const ajaxUrl = wp_focal_point_ajax.ajax_url;
+    const data = new FormData();
+
+    data.append('action', 'wp_focal_point_save');
+    data.append('nonce', wp_focal_point_ajax.nonce);
+    data.append('imageId', imageId);
+    data.append('posX', posX);
+    data.append('posY', posY);
+
+    fetch(ajaxUrl, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: data
+    })
+    .then((response) => {
+      if(response.ok) {
+        console.log('Focal point saved');
+      } else {
+        console.log('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   }
 
   eventListeners();
