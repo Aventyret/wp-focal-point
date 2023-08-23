@@ -23,4 +23,5 @@ define('WP_FOCAL_POINT_URI', plugin_dir_url( __FILE__ ));
 define('WP_FOCAL_POINT_VER', "0.0.1");
 
 require_once(WP_FOCAL_POINT_DIR . 'includes/fields.php');
+require_once(WP_FOCAL_POINT_DIR . 'public/functions.php');
 require_once(WP_FOCAL_POINT_DIR . 'public/hooks.php');
