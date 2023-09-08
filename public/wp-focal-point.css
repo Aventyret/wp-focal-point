@@ -13,6 +13,10 @@
   display: flex;
 }
 
+.fpt_ModalTitle {
+  margin-bottom: 15px;
+}
+
 .fpt_ModalColLeft {
   padding-right: 40px;
 }
@@ -129,4 +133,47 @@
 .fpt-preview-portrait {
   width: 60px;
   height: 100px;
+}
+
+.save-focal-point {
+  position: relative;
+}
+
+.save-focal-point::after {
+  content: "";
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  width: 20px;
+  height: 20px;
+  top: 20px;
+  animation: 0.8s spin infinite;
+  background-color: black;
+  display: inline-block;
+  position: absolute;
+  right: -30px;
+  top: 4px;
+  opacity: 0;
+}
+
+.save-focal-point.loading::after {
+  opacity: 1;
+  mask-image: url("images/loader.svg");
+  -webkit-mask-image: url("images/loader.svg");
+}
+
+.save-focal-point.added::after {
+  mask-image: url("images/check.svg");
+  -webkit-mask-image: url("images/check.svg");
+  animation: none;
+  transform: rotate(0deg);
+}
+
+@keyframes spin {
+  from {
+      transform:rotate(0deg);
+  }
+  to {
+      transform:rotate(360deg);
+  }
 }

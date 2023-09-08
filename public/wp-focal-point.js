@@ -64,7 +64,7 @@
   function displayFocalPoint() {
     const posXPercentage = Math.round(posX * 100);
     const posYPercentage = Math.round(posY * 100);
-    const cursor = document.querySelector('.fpt_cursor'); 
+    const cursor = document.querySelector('.fpt_cursor');
     const previewEls = document.querySelectorAll('.fpt-preview img');
 
     document.querySelector('.posX').innerHTML = posXPercentage;
@@ -79,7 +79,7 @@
     const imageEl = document.querySelector('.wp-focal-point-image');
     const imageHeight = imageEl.offsetHeight;
     const imageWidth = imageEl.offsetWidth;
-   
+
     let rect = imageEl.getBoundingClientRect();
 
     posX = (e.pageX - rect.left) / imageWidth;
@@ -106,10 +106,17 @@
     })
     .then((response) => {
       if(response.ok) {
+        document.querySelector('.save-focal-point').classList.add('loading');
         console.log('Focal point saved');
         openButtonEl.setAttribute('data-wp-fp-x', posX);
         openButtonEl.setAttribute('data-wp-fp-y', posY);
-
+        setTimeout(() => {
+          document.querySelector('.save-focal-point').classList.add('added');
+        }, 500);
+        setTimeout(() => {
+          document.querySelector('.save-focal-point').classList.remove('loading');
+          document.querySelector('.save-focal-point').classList.remove('added');
+        }, 1000);
       } else {
         console.log('Something went wrong');
       }
